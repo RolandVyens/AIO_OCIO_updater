@@ -1,0 +1,18 @@
+schema_version = "1.0.0"
+id = "aio_ocio_updater"
+version = "1.0.0"
+name = "AIO-OCIO Updater"
+tagline = "Install and update AIO-OCIO color configuration for Blender"
+maintainer = "Roland Vyens <roland@example.com>"
+type = "add-on"
+
+# Blender version requirements
+blender_version_min = "4.1.0"
+
+# License
+license = ["SPDX:GPL-3.0-or-later"]
+
+# Permissions required
+[permissions]
+network = "Download AIO-OCIO files from GitHub"
+files = "Install OCIO config to Blender's colormanagement folder"
