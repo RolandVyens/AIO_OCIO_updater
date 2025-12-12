@@ -14,6 +14,7 @@ bl_info = {
 import bpy
 import os
 import shutil
+import stat
 import tempfile
 import zipfile
 import urllib.request
@@ -89,6 +90,19 @@ def get_colormanagement_path():
     user_path = bpy.utils.resource_path('USER')
     cm_path = os.path.join(user_path, 'datafiles', 'colormanagement')
     return cm_path
+
+
+def rmtree_force(path):
+    """Remove directory tree, handling read-only files (like .git objects on Windows)."""
+    def on_rm_error(func, path, exc_info):
+        # Handle read-only files by removing the read-only attribute
+        try:
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        except Exception:
+            pass
+    
+    shutil.rmtree(path, onerror=on_rm_error)
 
 
 def get_version_info():
@@ -318,7 +332,7 @@ class OCIO_OT_install_update(Operator):
             # Backup existing if present
             if os.path.exists(cm_path):
                 if os.path.exists(backup_path):
-                    shutil.rmtree(backup_path)
+                    rmtree_force(backup_path)
                 shutil.move(cm_path, backup_path)
             
             self.update_progress(0.9, "Installing new config...")
@@ -354,7 +368,7 @@ class OCIO_OT_install_update(Operator):
             # Cleanup temp directory
             if temp_dir and os.path.exists(temp_dir):
                 try:
-                    shutil.rmtree(temp_dir)
+                    rmtree_force(temp_dir)
                 except Exception:
                     pass
             
